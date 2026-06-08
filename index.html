@@ -308,24 +308,31 @@
             if(heartPercent >= 100) setTimeout(() => goTo('page3'), 600);
         }
 
-        // หน้า 3 Logic (ขูด 80% ถึงเปลี่ยนหน้า)
+        // หน้า 3 Logic (ปรับตัวอักษรกึ่งกลางเป๊ะ + ขูดเสร็จค้างไว้ 5 วิ)
         function startScratch() {
             const c = document.getElementById('scratchCanvas'); const ctx = c.getContext('2d');
             ctx.fillStyle = '#ffacc5'; ctx.fillRect(0,0,300,300);
-            ctx.fillStyle = '#fff'; ctx.font = 'bold 24px Kanit'; ctx.textAlign = 'center';
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 24px Kanit'; 
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle'; // ปรับจัดวางแนวตั้งให้อยู่กึ่งกลางสมบูรณ์
             ctx.fillText('ลองขูดดูสิ', 150, 150);
             
             let isDrawing = false;
+            let scratchFinished = false; // กันฟังก์ชันทำงานซ้ำซ้อนซ้ำ ๆ ตอนหน่วงเวลา
+
             function scratch(x,y) {
+                if(scratchFinished) return;
                 ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(x,y,35,0,Math.PI*2); ctx.fill();
                 checkScratchProgress();
             }
             function checkScratchProgress() {
+                if(scratchFinished) return;
                 const d = ctx.getImageData(0,0,300,300).data;
                 let cleared = 0;
                 for(let i=3; i<d.length; i+=4) if(d[i]===0) cleared++;
                 if(cleared/(300*300) >= 0.8) { // เมื่อขูดถึง 80%
-                    setTimeout(() => goTo('page4'), 500);
+                    scratchFinished = true;
+                    setTimeout(() => goTo('page4'), 5000); // เปลี่ยนเป็นหน่วงเวลา 5000 มิลลิวินาที (5 วินาที)
                 }
             }
             const move = (e) => { 
