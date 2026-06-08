@@ -87,6 +87,9 @@
             border: 8px solid white; border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15); overflow: hidden;
         }
+        .scratch-hint-text {
+            margin-top: 20px; font-size: 1.3rem; font-weight: 600; color: #ff5c8a; text-align: center;
+        }
 
         /* --- PAGE 4: GALLERY GAME --- */
         .room-scene {
@@ -200,6 +203,8 @@
             <img src="photo7.jpg" style="width:100%; height:100%; object-fit:cover;">
             <canvas id="scratchCanvas" width="300" height="300" style="position:absolute; top:0; left:0; cursor:pointer;"></canvas>
         </div>
+        <!-- ย้ายข้อความมาอยู่ด้านล่างรูปตรงกลาง -->
+        <div class="scratch-hint-text">ขูดให้หมดนะ 🩷</div>
     </div>
 
     <div id="page4" class="page" style="padding:0;">
@@ -308,16 +313,10 @@
             if(heartPercent >= 100) setTimeout(() => goTo('page3'), 600);
         }
 
-        // หน้า 3 Logic (ปรับตัวอักษรกึ่งกลางเป๊ะ + ขูดเสร็จค้างไว้ 3 วิ)
+        // หน้า 3 Logic
         function startScratch() {
             const c = document.getElementById('scratchCanvas'); const ctx = c.getContext('2d');
             ctx.fillStyle = '#ffacc5'; ctx.fillRect(0,0,300,300);
-            
-            // ตั้งค่าการจัดวางข้อความให้อยู่จุดกึ่งกลางอย่างถูกต้อง
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#fff'; ctx.font = 'bold 24px Kanit'; 
-            ctx.fillText('ลองขูดดูสิ', 150, 150);
             
             let isDrawing = false;
             let scratchFinished = false; // กันฟังก์ชันทำงานซ้ำซ้อนซ้ำ ๆ ตอนหน่วงเวลา
@@ -332,9 +331,9 @@
                 const d = ctx.getImageData(0,0,300,300).data;
                 let cleared = 0;
                 for(let i=3; i<d.length; i+=4) if(d[i]===0) cleared++;
-                if(cleared/(300*300) >= 1.0) { // ปรับเมื่อขูดครบ 100% (1.0)
+                if(cleared/(300*300) >= 0.98) { // ปรับเงื่อนไขการขูดเสร็จเป็น 98% (0.98)
                     scratchFinished = true;
-                    setTimeout(() => goTo('page4'), 3000); // หน่วงเวลาเหลือ 3 วินาที (3000 มิลลิวินาที)
+                    setTimeout(() => goTo('page4'), 3000); // หน่วงเวลาค้างไว้ 3 วินาที (3000 มิลลิวินาที)
                 }
             }
             const move = (e) => { 
